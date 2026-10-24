@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuiMedo Quiroga - Esquema de Supervivencia "Fulanas"</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=JetBrains+Mono:wght@400;700&family=Montserrat:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        horror: {
+                            bg: '#07060A',
+                            card: '#110D18',
+                            border: '#2A1F3B',
+                            green: '#39FF14',
+                            red: '#FF0055',
+                            purple: '#9D4EDD',
+                            yellow: '#FFCC00',
+                            darkRed: '#5C001E'
+                        }
+                    },
+                    fontFamily: {
+                        creepster: ['Creepster', 'cursive'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Glowing & Animation Utilities */
+        body {
+            background-color: #07060A;
+            color: #E2E8F0;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(157, 78, 221, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(255, 0, 85, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(57, 255, 20, 0.03) 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+
+        .glow-green {
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+        }
+        .glow-red {
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.5);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.4);
+        }
+
+        .text-glow-green {
+            text-shadow: 0 0 8px rgba(57, 255, 20, 0.7);
+        }
+        .text-glow-red {
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.8);
+        }
+        .text-glow-purple {
+            text-shadow: 0 0 10px rgba(157, 78, 221, 0.8);
+        }
+
+        /* Pulse animations for SVG elements */
+        @keyframes pulse-path {
+            0%, 100% { stroke-dashoffset: 0; opacity: 0.9; }
+            50% { stroke-dashoffset: 20; opacity: 0.4; }
+        }
+        .animate-path {
+            stroke-dasharray: 8, 8;
+            animation: pulse-path 3s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(1000%); }
+        }
+        .scanline-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanline-effect::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: rgba(57, 255, 20, 0.2);
+            opacity: 0.6;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07060A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2A1F3B;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FF0055;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen pb-12 selection:bg-horror-red selection:text-white">
+
+    <!-- MAIN WRAPPER -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+
+        <!-- TOP TOOLBAR & CONTROLS -->
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-6 bg-horror-card/80 backdrop-blur border border-horror-border p-4 rounded-xl">
+            <div class="flex items-center gap-3">
+                <span class="inline-block w-3 h-3 rounded-full bg-horror-green animate-ping"></span>
+                <span class="font-mono text-xs text-horror-green font-bold tracking-widest uppercase">Transmisión de Emergencia activa · Quiroga</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-horror-border hover:bg-horror-purple/40 text-xs font-mono transition border border-horror-purple/50 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Imprimir / Exportar
+                </button>
+                <button id="toggleGlowCollarBtn" onclick="toggleGlowMode()" class="px-3 py-1.5 rounded-lg bg-horror-red/20 hover:bg-horror-red/40 text-horror-red hover:text-white text-xs font-mono font-bold transition border border-horror-red flex items-center gap-2">
+                    <span id="collarDot" class="w-2 h-2 rounded-full bg-horror-red"></span>
+                    <span id="collarText">Modo Mac Guarro: COLLAR OFF</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- HEADER SECTION -->
+        <header class="text-center py-8 relative scanline-effect bg-horror-card border border-horror-border rounded-2xl mb-8 overflow-hidden shadow-2xl">
+            <div class="absolute -top-24 -left-24 w-60 h-60 bg-horror-purple/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-60 h-60 bg-horror-red/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="inline-block px-4 py-1 rounded-full bg-horror-red/10 border border-horror-red/30 text-horror-red text-xs font-mono uppercase tracking-widest mb-3">
+                ⚠️ Protocolo Táctico de Infiltración Nocturna
+            </div>
+
+            <h1 class="font-creepster text-5xl sm:text-7xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-horror-red via-white to-horror-purple tracking-wider drop-shadow-lg mb-2">
+                QUIMEDO · QUIROGA
+            </h1>
+            
+            <p class="text-gray-400 font-mono text-sm max-w-2xl mx-auto px-4 mb-6">
+                Guía interactiva de supervivencia y mapa de ruta por el casco urbano de Quiroga.
+            </p>
+
+            <!-- TEAM BADGE -->
+            <div class="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-black/60 border-2 border-horror-green glow-green">
+                <span class="text-2xl">💀</span>
+                <div class="text-left">
+                    <span class="block text-[10px] font-mono text-gray-400 uppercase tracking-widest">Escuadrón Registrado</span>
+                    <span class="font-mono text-lg font-black text-horror-green tracking-wider text-glow-green">EQUIPO: FULANAS</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- SQUAD ROSTER / FEAR METERS -->
+        <section class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-creepster text-3xl text-horror-purple text-glow-purple flex items-center gap-2">
+                    <span>👥</span> Integrantes del Escuadrón & Diagnóstico de Pánico
+                </h2>
+                <span class="text-xs font-mono text-gray-500">Estado vital en tiempo real</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                
+                <!-- MEMBER 1: NOE -->
+                <div class="squad-card bg-horror-card border border-horror-red/40 rounded-xl p-4 relative overflow-hidden transition hover:border-horror-red group">
+                    <div class="absolute top-0 right-0 bg-horror-red text-black font-mono text-[10px] font-bold px-2 py-0.5 rounded-bl">
+                        🚨 ALERTA CRÍTICA
+                    </div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-horror-red/20 border-2 border-horror-red flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                            😱
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Noe</h3>
+                            <span class="text-xs font-mono text-horror-red">Asustadiza Nivel 1</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5 font-mono text-xs">
+                        <div class="flex justify-between text-gray-400">
+                            <span>Índice Pánico:</span>
+                            <span class="text-horror-red font-bold">99%</span>
+                        </div>
+                        <div class="w-full bg-black/60 h-2 rounded-full overflow-hidden border border-horror-border">
+                            <div class="bg-horror-red h-full rounded-full" style="width: 99%"></div>
+                        </div>
+                        <p class="text-[11px] text-gray-400 pt-2 italic">
+                            🛡️ <strong class="text-gray-300">Rol recomendado:</strong> Colocarse detrás de Rubén en todo momento.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- MEMBER 2: ADRIANA -->
+                <div class="squad-card bg-horror-card border border-horror-red/40 rounded-xl p-4 relative overflow-hidden transition hover:border-horror-red group">
+                    <div class="absolute top-0 right-0 bg-horror-red text-black font-mono text-[10px] font-bold px-2 py-0.5 rounded-bl">
+                        🚨 ALERTA CRÍTICA
+                    </div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-horror-red/20 border-2 border-horror-red flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                            😱
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Adriana</h3>
+                            <span class="text-xs font-mono text-horror-red">Asustadiza Nivel 1</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5 font-mono text-xs">
+                        <div class="flex justify-between text-gray-400">
+                            <span>Índice Pánico:</span>
+                            <span class="text-horror-red font-bold">98%</span>
+                        </div>
+                        <div class="w-full bg-black/60 h-2 rounded-full overflow-hidden border border-horror-border">
+                            <div class="bg-horror-red h-full rounded-full" style="width: 98%"></div>
+                        </div>
+                        <p class="text-[11px] text-gray-400 pt-2 italic">
+                            🚫 <strong class="text-gray-300">Rol recomendado:</strong> Prohibido mirar a los ojos a los espantapájaros.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- MEMBER 3: RUBÉN -->
+                <div class="squad-card bg-horror-card border border-horror-purple/40 rounded-xl p-4 relative overflow-hidden transition hover:border-horror-purple group">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-horror-purple/20 border-2 border-horror-purple flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                            🛡️
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Rubén</h3>
+                            <span class="text-xs font-mono text-horror-purple">Tanque / Escudo</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5 font-mono text-xs">
+                        <div class="flex justify-between text-gray-400">
+                            <span>Índice Pánico:</span>
+                            <span class="text-horror-purple font-bold">35%</span>
+                        </div>
+                        <div class="w-full bg-black/60 h-2 rounded-full overflow-hidden border border-horror-border">
+                            <div class="bg-horror-purple h-full rounded-full" style="width: 35%"></div>
+                        </div>
+                        <p class="text-[11px] text-gray-400 pt-2 italic">
+                            🗺️ <strong class="text-gray-300">Misión:</strong> Custodio oficial del mapa y escudo de Noe.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- MEMBER 4: ALEX -->
+                <div class="squad-card bg-horror-card border border-horror-green/40 rounded-xl p-4 relative overflow-hidden transition hover:border-horror-green group">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-horror-green/20 border-2 border-horror-green flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                            🔦
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Alex</h3>
+                            <span class="text-xs font-mono text-horror-green">Vanguardia</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5 font-mono text-xs">
+                        <div class="flex justify-between text-gray-400">
+                            <span>Índice Pánico:</span>
+                            <span class="text-horror-green font-bold">25%</span>
+                        </div>
+                        <div class="w-full bg-black/60 h-2 rounded-full overflow-hidden border border-horror-border">
+                            <div class="bg-horror-green h-full rounded-full" style="width: 25%"></div>
+                        </div>
+                        <p class="text-[11px] text-gray-400 pt-2 italic">
+                            🚶‍♂️ <strong class="text-gray-300">Misión:</strong> Abrir camino en esquinas oscuras y callejones.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- MEMBER 5: DOMI -->
+                <div class="squad-card bg-horror-card border border-horror-yellow/40 rounded-xl p-4 relative overflow-hidden transition hover:border-horror-yellow group">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-horror-yellow/20 border-2 border-horror-yellow flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                            🧭
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Domi</h3>
+                            <span class="text-xs font-mono text-horror-yellow">Estratega</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5 font-mono text-xs">
+                        <div class="flex justify-between text-gray-400">
+                            <span>Índice Pánico:</span>
+                            <span class="text-horror-yellow font-bold">30%</span>
+                        </div>
+                        <div class="w-full bg-black/60 h-2 rounded-full overflow-hidden border border-horror-border">
+                            <div class="bg-horror-yellow h-full rounded-full" style="width: 30%"></div>
+                        </div>
+                        <p class="text-[11px] text-gray-400 pt-2 italic">
+                            ⏱️ <strong class="text-gray-300">Misión:</strong> Control del cronómetro (Límite de 3 horas).
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TIMELINE & FLOW (SVG + CARDS) -->
+        <section class="mb-10 bg-horror-card border border-horror-border rounded-2xl p-6 relative">
+            <h2 class="font-creepster text-3xl text-horror-green text-glow-green mb-6 flex items-center gap-2">
+                <span>⏰</span> Cronograma & Flujo Temporal del Evento
+            </h2>
+
+            <!-- SVG Timeline graphic -->
+            <div class="w-full overflow-x-auto mb-6 pb-2">
+                <svg viewBox="0 0 1000 180" class="w-full min-w-[700px] h-auto">
+                    <!-- Background Connecting Line -->
+                    <path d="M 100 90 L 500 90 L 900 90" stroke="#2A1F3B" stroke-width="8" stroke-linecap="round"/>
+                    <path d="M 100 90 L 500 90 L 900 90" class="animate-path" stroke="#39FF14" stroke-width="4" stroke-linecap="round"/>
+
+                    <!-- NODE 1: 19:00 -->
+                    <g transform="translate(100, 90)">
+                        <circle r="32" fill="#110D18" stroke="#39FF14" stroke-width="4" class="glow-green"/>
+                        <text y="-45" font-family="JetBrains Mono" font-weight="bold" font-size="18" fill="#39FF14" text-anchor="middle">19:00 H</text>
+                        <text y="6" font-family="Montserrat" font-size="22" text-anchor="middle">🎟️</text>
+                        <text y="50" font-family="Montserrat" font-weight="bold" font-size="13" fill="#FFFFFF" text-anchor="middle">Apertura & Pulseras</text>
+                        <text y="68" font-family="Montserrat" font-size="11" fill="#94A3B8" text-anchor="middle">Líder recoge accesos</text>
+                    </g>
+
+                    <!-- NODE 2: 21:30 -->
+                    <g transform="translate(500, 90)">
+                        <circle r="36" fill="#110D18" stroke="#FF0055" stroke-width="4" class="glow-red"/>
+                        <text y="-48" font-family="JetBrains Mono" font-weight="bold" font-size="20" fill="#FF0055" text-anchor="middle">21:30 H</text>
+                        <text y="8" font-family="Montserrat" font-size="26" text-anchor="middle">☠️</text>
+                        <text y="52" font-family="Montserrat" font-weight="bold" font-size="14" fill="#FFFFFF" text-anchor="middle">Presentación & Salida</text>
+                        <text y="70" font-family="Montserrat" font-size="11" fill="#94A3B8" text-anchor="middle">Inicio de la cacería</text>
+                    </g>
+
+                    <!-- NODE 3: 00:30 -->
+                    <g transform="translate(900, 90)">
+                        <circle r="32" fill="#110D18" stroke="#9D4EDD" stroke-width="4" class="glow-purple"/>
+                        <text y="-45" font-family="JetBrains Mono" font-weight="bold" font-size="18" fill="#9D4EDD" text-anchor="middle">00:30 H MAX</text>
+                        <text y="6" font-family="Montserrat" font-size="22" text-anchor="middle">⏳</text>
+                        <text y="50" font-family="Montserrat" font-weight="bold" font-size="13" fill="#FFFFFF" text-anchor="middle">Cierre del Límite</text>
+                        <text y="68" font-family="Montserrat" font-size="11" fill="#94A3B8" text-anchor="middle">3 horas de itinerario</text>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- TIMELINE DETAILS GRID -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+                <div class="p-4 bg-black/40 rounded-xl border border-horror-green/30">
+                    <span class="text-horror-green font-bold block mb-1">FASE 1: LLEGADA Y LOGÍSTICA</span>
+                    <ul class="space-y-1 text-gray-300 list-disc list-inside">
+                        <li>Apertura de puertas a las 19:00.</li>
+                        <li>El responsable de <strong>Fulanas</strong> recoge las pulseras oficiales.</li>
+                        <li>Fiesta infantil paralela (entrada libre sin inscripción).</li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-black/40 rounded-xl border border-horror-red/30">
+                    <span class="text-horror-red font-bold block mb-1">FASE 2: INICIO DE LA RUTA</span>
+                    <ul class="space-y-1 text-gray-300 list-disc list-inside">
+                        <li>Presentación oficial a las 21:30.</li>
+                        <li>Salida escalonada al casco urbano de Quiroga.</li>
+                        <li>Despliegue de actores en vivo en todos los inmuebles.</li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-black/40 rounded-xl border border-horror-purple/30">
+                    <span class="text-horror-purple font-bold block mb-1">FASE 3: LÍMITE DE TIEMPO</span>
+                    <ul class="space-y-1 text-gray-300 list-disc list-inside">
+                        <li>Tiempo máximo: <strong>3 Horas exactas</strong>.</li>
+                        <li>Uso obligatorio del mapa de la organización.</li>
+                        <li>Objetivo: Evitar embotellamientos en accesos.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- MASTER SCHEMATIC MAP OF THE 8 HORROR HOUSES (INTERACTIVE SVG GRID) -->
+        <section class="mb-10">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <div>
+                    <h2 class="font-creepster text-3xl text-white flex items-center gap-2">
+                        <span class="text-horror-red">📍</span> Mapa Esquemático de las 8 Casas del Terror
+                    </h2>
+                    <p class="text-xs font-mono text-gray-400">Haz clic sobre cualquier ubicación para inspeccionar el informe de peligro</p>
+                </div>
+                <div class="flex items-center gap-2 font-mono text-xs">
+                    <span class="flex items-center gap-1 text-horror-green"><span class="w-2.5 h-2.5 rounded-full bg-horror-green"></span> Nivel Medio</span>
+                    <span class="flex items-center gap-1 text-horror-purple"><span class="w-2.5 h-2.5 rounded-full bg-horror-purple"></span> Nivel Alto</span>
+                    <span class="flex items-center gap-1 text-horror-red"><span class="w-2.5 h-2.5 rounded-full bg-horror-red"></span> Extremo</span>
+                </div>
+            </div>
+
+            <!-- SVG CIRCUIT DIAGRAM -->
+            <div class="bg-horror-card border border-horror-border rounded-2xl p-4 sm:p-6 mb-6 overflow-hidden">
+                <svg id="routeSvg" viewBox="0 0 1000 520" class="w-full h-auto bg-black/50 rounded-xl border border-horror-border">
+                    <!-- SVG Definitions / Patterns -->
+                    <defs>
+                        <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#39FF14" />
+                            <stop offset="50%" stop-color="#9D4EDD" />
+                            <stop offset="100%" stop-color="#FF0055" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- CONNECTING CIRCUIT PATHS -->
+                    <path d="M 120 100 L 350 100 L 600 100 L 850 100 L 850 360 L 600 360 L 350 360 L 120 360" 
+                          fill="none" stroke="#2A1F3B" stroke-width="6" stroke-dasharray="6,6"/>
+                    <path d="M 120 100 L 350 100 L 600 100 L 850 100 L 850 360 L 600 360 L 350 360 L 120 360" 
+                          fill="none" stroke="url(#pathGradient)" stroke-width="3" class="animate-path"/>
+
+                    <!-- CONNECTIONS / DIRECTION ARROWS -->
+                    <polygon points="230,95 245,100 230,105" fill="#39FF14" />
+                    <polygon points="480,95 495,100 480,105" fill="#39FF14" />
+                    <polygon points="720,95 735,100 720,105" fill="#9D4EDD" />
+                    <polygon points="855,220 850,235 845,220" fill="#9D4EDD" />
+                    <polygon points="720,355 705,360 720,365" fill="#FF0055" />
+                    <polygon points="480,355 465,360 480,365" fill="#FF0055" />
+                    <polygon points="230,355 215,360 230,365" fill="#FF0055" />
+
+                    <!-- HOUSE NODE 1 -->
+                    <g class="cursor-pointer group" onclick="selectHouse(1)" transform="translate(120, 100)">
+                        <circle r="30" fill="#110D18" stroke="#39FF14" stroke-width="3" id="node-1"/>
+                        <text y="5" font-family="Montserrat" font-size="20" text-anchor="middle">🏛️</text>
+                        <text y="48" font-family="JetBrains Mono" font-weight="bold" font-size="12" fill="#39FF14" text-anchor="middle">1. O Museo</text>
+                    </g>
+
+                    <!-- HOUSE NODE 2 -->
+                    <g class="cursor-pointer group" onclick="selectHouse(2)" transform="translate(350, 100)">
+                        <circle r="30" fill="#110D18" stroke="#39FF14" stroke-width="3" id="node-2"/>
+                        <text y="5" font-family="Montserrat" font-size="20" text-anchor="middle">☣️</text>
+                        <text y="48" font-family="JetBrains Mono" font-weight="bold" font-size="12" fill="#39FF14" text-anchor="middle">2. Biohazard</text>
+                    </g>
+
+                    <!-- HOUSE NODE 3 -->
+                    <g class="cursor-pointer group" onclick="selectHouse(3)" transform="translate(600, 100)">
+                        <circle r="34" fill="#110D18" stroke="#FF0055" stroke-width="4" id="node-3" class="glow-red"/>
+                        <text y="5" font-family="Montserrat" font-size="22" text-anchor="middle">🏃‍♂️</text>
+                        <text y="50" font-family="JetBrains Mono" font-weight="bold" font-size="12" fill="#FF0055" text-anchor="middle">3. Survival</text>
+                        <text y="-42" font-family="JetBrains Mono" font-size="10" fill="#FF0055" text-anchor="middle" font-weight="bold">⚠️ ¡PELIGRO NOE & ADRI!</text>
+                    </g>
+
+                    <!-- HOUSE NODE 4 -->
+                    <g class="cursor-pointer group" onclick="selectHouse(4)" transform="translate(850, 100)">
+                        <circle r="30" fill="#110D18" stroke="#9D4EDD" stroke-width="3" id="node-4"/>
+                        <text y="5" font-family="Montserrat" font-size="20" text-anchor="middle">🪦</text>
+                        <text y="48" font-family="JetBrains Mono" font-weight="bold" font-size="12" fill="#9D4EDD" text-anchor="middle">4. Cemiterio</text>
+                    </g>
+
+                    <!-- HOUSE NODE 5 -->
+                    <g class="cursor-pointer group" onclick="selectHouse(5)" transform="translate(850, 360)">
+                        <circle r="30" fill="#110D18" stroke="#9D4EDD" stroke-width="3" id="node-5"/>
+                        <text y="5" font-family="Montserrat" font-size="20" text-anchor="middle">⛏️</text>
+                        <text y="48" font-family="JetBrains Mono" font-weight="bold" font-size="12" fill="#9D4EDD" text-anchor="middle">5. A Mina</text>
+                    </g>
+
+                    <!-- HOUSE NODE 6 -->
+                    <g class="cursor-pointer group" onclick="selectHouse(6)" transform="translate(600, 360)">
+                        <circle r="30" fill="#110D18" stroke="#FFCC00" stroke-width="3" id="node-6"/>
+                        <text y="5" font-family="Montserrat" font-size="20" text-anchor="middle">🌾</text>
+                        <text y="48" font-family="JetBrains Mono" font-weight="bold" font-size="12" fill="#FFCC00" text-anchor="middle">6. A Palleira</text>
+                    </g>
+
+                    <!-- HOUSE NODE 7 -->
+                    <g class="cursor-pointer group" onclick="selectHouse(7)" transform="translate(350, 360)">
+                        <circle r="36" fill="#110D18" stroke="#FF0055" stroke-width="4" id="node-7" class="glow-red"/>
+                        <text y="6" font-family="Montserrat" font-size="24" text-anchor="middle">🥩</text>
+                        <text y="52" font-family="JetBrains Mono" font-weight="bold" font-size="13" fill="#FF0055" text-anchor="middle">7. Mac Guarro</text>
+                        <text y="-44" font-family="JetBrains Mono" font-size="10" fill="#FF0055" text-anchor="middle" font-weight="bold">🔥 EXTREMA</text>
+                    </g>
+
+                    <!-- HOUSE NODE 8 -->
+                    <g class="cursor-pointer group" onclick="selectHouse(8)" transform="translate(120, 360)">
+                        <circle r="30" fill="#110D18" stroke="#39FF14" stroke-width="3" id="node-8"/>
+                        <text y="5" font-family="Montserrat" font-size="20" text-anchor="middle">❓</text>
+                        <text y="48" font-family="JetBrains Mono" font-weight="bold" font-size="12" fill="#39FF14" text-anchor="middle">8. Casa Sorpresa</text>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- DETAILED INSPECTOR PANEL FOR SELECTED HOUSE -->
+            <div id="inspectorCard" class="bg-horror-card border-2 border-horror-purple rounded-2xl p-6 transition-all duration-300">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-3 border-b border-horror-border pb-3">
+                    <div class="flex items-center gap-3">
+                        <span id="inspIcon" class="text-4xl p-2 rounded-xl bg-black/60 border border-horror-border">🏛️</span>
+                        <div>
+                            <span id="inspBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-horror-green/20 text-horror-green border border-horror-green/40">ESTACIÓN 1 DE 8</span>
+                            <h3 id="inspTitle" class="text-2xl font-bold text-white">O Museo das Civilizacións Malditas</h3>
+                        </div>
+                    </div>
+                    <div class="text-right font-mono">
+                        <span class="text-xs text-gray-400 block">Nivel de Hostilidad</span>
+                        <span id="inspThreat" class="text-sm font-bold text-horror-green">MODERADO</span>
+                    </div>
+                </div>
+                
+                <p id="inspDesc" class="text-gray-300 text-sm mb-4 leading-relaxed font-sans">
+                    Un recorrido inquietante por culturas antiguas y épocas repletas de misterios oscuros que jamás debieron ser descubiertos.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono bg-black/40 p-3 rounded-xl border border-horror-border">
+                    <div class="flex items-center gap-2">
+                        <span class="text-horror-purple">💡 Recomendación Fulanas:</span>
+                        <span id="inspAdvice" class="text-gray-300">Mantenerse agrupados y no tocar los artefactos.</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-horror-red">⚠️ Nivel de Alerta Noe/Adriana:</span>
+                        <span id="inspFearAlert" class="text-gray-300">Soportable con acompañamiento.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROTOCOL & MAC GUARRO COLLAR SIMULATOR -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            
+            <!-- SURVIVAL PROTOCOL -->
+            <div class="bg-horror-card border border-horror-border rounded-2xl p-6 flex flex-col justify-between">
+                <div>
+                    <h2 class="font-creepster text-3xl text-horror-yellow mb-4 flex items-center gap-2">
+                        <span>📋</span> Protocolo de Navegación Urbana
+                    </h2>
+                    <ul class="space-y-3 text-sm text-gray-300 font-sans">
+                        <li class="flex items-start gap-3">
+                            <span class="text-horror-yellow text-lg">🗺️</span>
+                            <span><strong>Uso del Mapa Oficial:</strong> Es indispensable seguir la ruta indicada por la organización para evitar atascos en los portales del casco urbano.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-horror-yellow text-lg">🎭</span>
+                            <span><strong>Actores en Directo:</strong> Los figurantes están ambientados en cada inmueble. Mantener el respeto a la escenografía.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-horror-yellow text-lg">⚡</span>
+                            <span><strong>Tácticas de Escuadrón:</strong> Alex delante con linterna, Rubén y Domi flanqueando, Noe y Adriana protegidas en el centro.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-6 pt-4 border-t border-horror-border text-xs font-mono text-gray-500">
+                    * Normativa sujeta a las indicaciones del personal de seguridad de Quiroga.
+                </div>
+            </div>
+
+            <!-- MAC GUARRO SPECIAL INTERACTION PANEL -->
+            <div class="bg-horror-card border-2 border-horror-red rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between">
+                <div class="absolute top-0 right-0 bg-horror-red text-black font-mono font-bold text-[10px] px-3 py-1 rounded-bl">
+                    EXPERIENCIA EXTREMA
+                </div>
+
+                <div>
+                    <h2 class="font-creepster text-3xl text-horror-red text-glow-red mb-2 flex items-center gap-2">
+                        <span>🥩</span> Casa Mac Guarro: Protocolo de Contacto
+                    </h2>
+                    <p class="text-xs font-mono text-gray-300 mb-4">
+                        Considerada la atracción más extrema de la edición. La interacción física con los figurantes es <strong>totalmente opcional</strong>.
+                    </p>
+
+                    <div class="bg-black/60 p-4 rounded-xl border border-horror-red/40 mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-mono text-xs font-bold text-white">¿Aceptas Contacto Físico?</span>
+                            <span id="collarStatusBadge" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-400">DESACTIVADO</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3">
+                            Quienes decidan llevar el <strong>collar fluorescente</strong> indican a los actores que autorizan el contacto durante el recorrido.
+                        </p>
+                        
+                        <button onclick="toggleGlowMode()" class="w-full py-2.5 rounded-xl font-mono text-xs font-bold transition flex items-center justify-center gap-2 bg-horror-red/20 text-horror-red hover:bg-horror-red hover:text-white border border-horror-red">
+                            <span>💡</span> <span id="collarBtnLabel">Equipar Collar Fluorescente para "Fulanas"</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-xs font-mono text-gray-400 italic">
+                    ⚠️ Recomendación: Se aconseja que Rubén, Alex y Domi valoren llevarlo, mientras que Noe y Adriana permanezcan sin collar.
+                </div>
+            </div>
+
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center border-t border-horror-border pt-8 pb-4 font-mono text-xs text-gray-500">
+            <p class="mb-2">
+                QUIMEDO QUIROGA · Documentación Generada Exclusivamente para el Escuadrón <strong class="text-horror-green">FULANAS</strong>
+            </p>
+            <p class="text-[10px] text-gray-600">
+                Integrantes: Noe · Rubén · Alex · Adriana · Domi | Que la suerte os acompañe en la oscuridad.
+            </p>
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // DATA FOR THE 8 HOUSES
+        const housesData = {
+            1: {
+                title: "1. O Museo das Civilizacións Malditas",
+                icon: "🏛️",
+                threat: "MODERADO",
+                threatColor: "text-horror-green",
+                borderColor: "border-horror-green",
+                badge: "ESTACIÓN 1 DE 8",
+                desc: "Un recorrido inquietante por culturas y épocas del pasado repletas de oscuros misterios que nunca debieron ser descubiertos.",
+                advice: "Inspeccionar las vitrinas sin tocar los artefactos antiguos.",
+                fearAlert: "Noe y Adriana pueden liderar esta parte para ganar confianza."
+            },
+            2: {
+                title: "2. Biohazard: Zona Cero",
+                icon: "☣️",
+                threat: "ALTO",
+                threatColor: "text-horror-purple",
+                borderColor: "border-horror-purple",
+                badge: "ESTACIÓN 2 DE 8",
+                desc: "Un taller mecánico reconvertido en el epicentro de un brote biológico e infeccioso incontrolable con presencia de humos y alarmas.",
+                advice: "Cubrirse la boca y no separarse de Alex en los pasillos oscuros.",
+                fearAlert: "Nivel de pánico medio. Evitar quedarse en el último lugar del grupo."
+            },
+            3: {
+                title: "3. Survival: Os Sete Cazadores",
+                icon: "🏃‍♂️",
+                threat: "PELIGRO ELEVADO",
+                threatColor: "text-horror-red",
+                borderColor: "border-horror-red",
+                badge: "ESTACIÓN 3 DE 8 · ¡CUIDADO!",
+                desc: "Laberinto claustrofóbico donde los participantes deben esquivar a 7 perseguidores con la única misión de no ser capturados.",
+                advice: "Rubén debe abrir paso haciendo escudo físico. Prohibido soltarse las manos.",
+                fearAlert: "🚨 MÁXIMA ALERTA PARA NOE Y ADRIANA. Mantenerlas en el centro exacto del grupo."
+            },
+            4: {
+                title: "4. O Cemiterio do QuiMedo",
+                icon: "🪦",
+                threat: "ALTO (AMBIENTACIÓN)",
+                threatColor: "text-horror-purple",
+                borderColor: "border-horror-purple",
+                badge: "ESTACIÓN 4 DE 8 · UBICACIÓN INÉDITA",
+                desc: "Ubicación completamente nueva plagada de cruces, lápidas auténticas, niebla densa y sombras acechantes.",
+                advice: "Caminar despacio para no tropezar con las lápidas y cruces.",
+                fearAlert: "Adriana debe evitar mirar fijamente las sombras de las esquinas."
+            },
+            5: {
+                title: "5. A Mina",
+                icon: "⛏️",
+                threat: "CLAUSTROFOBIA ALTA",
+                threatColor: "text-horror-purple",
+                borderColor: "border-horror-purple",
+                badge: "ESTACIÓN 5 DE 8",
+                desc: "Inspirada en galerías subterráneas donde aún permanecen encendidas las linternas de mineros que jamás regresaron a la superficie.",
+                advice: "Domi debe vigilar el reloj; el paso por la mina suele ralentizar el ritmo.",
+                fearAlert: "Efectos de eco profundo. Noe debe usar tapones de oído si se satura."
+            },
+            6: {
+                title: "6. A Palleira",
+                icon: "🌾",
+                threat: "DESORIENTACIÓN",
+                threatColor: "text-horror-yellow",
+                borderColor: "border-horror-yellow",
+                badge: "ESTACIÓN 6 DE 8",
+                desc: "Escenario nocturno tradicional donde los espantapájaros aparentemente inmóviles cobran vida al pasar a su lado.",
+                advice: "Alex debe verificar qué figuras son maniquíes y cuáles son actores.",
+                fearAlert: "Sustos por sorpresa a corta distancia. No acercarse a las alpacas."
+            },
+            7: {
+                title: "7. Mac Guarro (CASA EXTREMA)",
+                icon: "🥩",
+                threat: "EXTREMO CRÍTICO",
+                threatColor: "text-horror-red",
+                borderColor: "border-horror-red",
+                badge: "ESTACIÓN 7 DE 8 · CASA MÁS EXTREMA",
+                desc: "La atracción más intensa del evento. Cada participante decide si autoriza el contacto físico mediante el collar fluorescente.",
+                advice: "Si se lleva collar, prepararse para empujones teatrales e interacción directa.",
+                fearAlert: "⚠️ Noe y Adriana deben IR SIN COLLAR obligatoriamente para evitar sobresaltos físicos."
+            },
+            8: {
+                title: "8. [8ª Casa Sorpresa / Secreta]",
+                icon: "❓",
+                threat: "INCÓGNITA",
+                threatColor: "text-horror-green",
+                borderColor: "border-horror-green",
+                badge: "ESTACIÓN 8 DE 8 · CLAXON FINAL",
+                desc: "La última propuesta mantenida en secreto por la organización para cerrar el itinerario de la noche.",
+                advice: "Disfrutar del tramo final y verificar que todo el equipo 'Fulanas' esté completo.",
+                fearAlert: "Celebración tras completar la prueba de supervivencia."
+            }
+        };
+
+        // HOUSE SELECTION LOGIC
+        function selectHouse(id) {
+            const data = housesData[id];
+            if (!data) return;
+
+            // Highlight inspector card
+            const card = document.getElementById('inspectorCard');
+            card.className = `bg-horror-card border-2 ${data.borderColor} rounded-2xl p-6 transition-all duration-300 shadow-2xl`;
+
+            document.getElementById('inspIcon').innerText = data.icon;
+            document.getElementById('inspTitle').innerText = data.title;
+            document.getElementById('inspBadge').innerText = data.badge;
+            document.getElementById('inspDesc').innerText = data.desc;
+            document.getElementById('inspAdvice').innerText = data.advice;
+            document.getElementById('inspFearAlert').innerText = data.fearAlert;
+
+            const threatElem = document.getElementById('inspThreat');
+            threatElem.innerText = data.threat;
+            threatElem.className = `text-sm font-bold ${data.threatColor}`;
+
+            // Reset node highlights
+            for (let i = 1; i <= 8; i++) {
+                const node = document.getElementById(`node-${i}`);
+                if (node) {
+                    if (i === id) {
+                        node.setAttribute('stroke-width', '6');
+                    } else {
+                        node.setAttribute('stroke-width', (i===3 || i===7) ? '4' : '3');
+                    }
+                }
+            }
+        }
+
+        // MAC GUARRO COLLAR MODE TOGGLE
+        let glowCollarActive = false;
+
+        function toggleGlowMode() {
+            glowCollarActive = !glowCollarActive;
+            
+            const btnText = document.getElementById('collarText');
+            const collarDot = document.getElementById('collarDot');
+            const badge = document.getElementById('collarStatusBadge');
+            const btnLabel = document.getElementById('collarBtnLabel');
+            const squadCards = document.querySelectorAll('.squad-card');
+
+            if (glowCollarActive) {
+                btnText.innerText = "Modo Mac Guarro: COLLAR ON (ACTIVADO)";
+                collarDot.className = "w-2 h-2 rounded-full bg-horror-green animate-ping";
+                badge.innerText = "ACTIVADO (CONTACTO AUTORIZADO)";
+                badge.className = "text-xs font-mono font-bold px-2 py-0.5 rounded bg-horror-green/20 text-horror-green border border-horror-green/40";
+                btnLabel.innerText = "Quitar Collar Fluorescente";
+
+                squadCards.forEach(card => {
+                    card.classList.add('glow-green', 'border-horror-green');
+                });
+            } else {
+                btnText.innerText = "Modo Mac Guarro: COLLAR OFF";
+                collarDot.className = "w-2 h-2 rounded-full bg-horror-red";
+                badge.innerText = "DESACTIVADO";
+                badge.className = "text-xs font-mono font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-400";
+                btnLabel.innerText = "Equipar Collar Fluorescente para \"Fulanas\"";
+
+                squadCards.forEach(card => {
+                    card.classList.remove('glow-green', 'border-horror-green');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
